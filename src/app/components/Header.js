@@ -11,11 +11,12 @@ const Header = () => {
 
   return (
     <AppBar sx={{
-      margin:'8px'
+      marginBottom:'10px',
+      borderRadius:'10px'
     }}position="sticky" color="primary">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6" component="div">
-          DigiKhata
+          Mehboob Enterprises
         </Typography>
         <Button
   onClick={() => {

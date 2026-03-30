@@ -24,6 +24,8 @@ export default function Dashboard() {
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Button
+
+          sx={{borderRadius:'10px', backgroundColor:'#5e1269'}}
             fullWidth
             variant="contained"
             onClick={() => router.push("/master")}
@@ -34,6 +36,7 @@ export default function Dashboard() {
 
         <Grid item xs={6}>
           <Button
+          sx={{borderRadius:'10px',backgroundColor:'#064d25'}}
             fullWidth
             variant="contained"
             onClick={() => router.push("/transactions")}
@@ -44,6 +47,7 @@ export default function Dashboard() {
 
         <Grid item xs={6}>
           <Button
+          sx={{borderRadius:'10px',backgroundColor:'#bf930d'}}
             fullWidth
             variant="contained"
             onClick={() => router.push("/report")}
@@ -53,13 +57,17 @@ export default function Dashboard() {
         </Grid>
 
         <Grid item xs={6}>
-          <Button fullWidth variant="contained">
+          <Button
+          sx={{borderRadius:'10px',backgroundColor:'#268581'}}
+           fullWidth variant="contained">
             Sales (Coming)
           </Button>
         </Grid>
-
+                                                                                                  
         <Grid item xs={6}>
-          <Button fullWidth variant="contained">
+          <Button 
+          sx={{borderRadius:'10px',backgroundColor:'#bf430d'}}
+          fullWidth variant="contained">
             Purchase (Coming)
           </Button>
         </Grid>
