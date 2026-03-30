@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import {
@@ -12,6 +13,8 @@ import {
 export default function Report() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/report")
@@ -31,7 +34,7 @@ export default function Report() {
 
   const totalPay = filtered
     .filter((p) => p.balance < 0)
-    .reduce((sum, p) => sum + p.balance, 0);
+    .reduce((sum, p) => sum -( p.balance), 0);
 
   return (
     <Box p={3}>
@@ -51,7 +54,7 @@ export default function Report() {
       {/* 💰 Summary */}
       <Box mb={2}>
         <Typography color="green">
-          You Will Receive: Rs {totalReceive}
+          You Will Receive: Rs {Math.abs(totalReceive)}
         </Typography>
 
         <Typography color="red">
@@ -68,7 +71,9 @@ export default function Report() {
               justifyContent: "space-between",
             }}
           >
-            <Typography>{p.name}</Typography>
+            <Typography sx={{ mb: 1, cursor: "pointer" }} onClick={() => router.push(`/ledger/${p.id}`)}>
+            
+            {p.name}</Typography>
 
             <Typography
               sx={{
