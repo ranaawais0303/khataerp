@@ -39,7 +39,7 @@ export async function PUT(req) {
   try {
     const { party_id } = await req.json();
     const [rows] = await db.query(
-      "SELECT * FROM transactions WHERE party_id = ? ORDER BY date ASC",
+      "SELECT * FROM transactions WHERE party_id = ? ORDER BY id ASC",
       [party_id]
     );
     return new Response(JSON.stringify(rows), { status: 200 });
