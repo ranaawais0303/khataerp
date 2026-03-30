@@ -24,7 +24,7 @@ export async function GET() {
     const [rows] = await db.query(`
       SELECT p.id, p.name, p.type
       FROM party p
-      ORDER BY p.name ASC
+      ORDER BY p.id ASC
     `);
 
     return Response.json(rows);
