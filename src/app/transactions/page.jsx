@@ -14,6 +14,9 @@ import {
   MenuItem,
 } from "@mui/material";
 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 import { useRouter } from "next/navigation";
 
 
@@ -74,7 +77,103 @@ export default function Transactions() {
   });
 
   alert("Transaction Saved ✅");
+  // 🧾 Generate PDF after save
+ 
+const doc = new jsPDF();
+
+// 🧾 Title (center)
+doc.setFontSize(18);
+doc.text("SUPER INVOICE", 105, 10, { align: "center" });
+
+// 📅 Right top (date & time)
+const now = new Date();
+doc.setFontSize(10);
+doc.text(
+  `Date: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`,
+  200,
+  10,
+  { align: "right" }
+);
+
+// 👤 Left top (customer)
+doc.text(`Customer: ${selectedParty.name}`, 10, 20);
+
+// 📋 Table header
+let y = 40;
+doc.setFontSize(12);
+doc.text("Details", 10, y);
+doc.text("Amount", 160, y);
+
+// ➖ Line
+y += 5;
+doc.line(10, y, 200, y);
+
+// 📄 Data row
+y += 10;
+doc.text(form.details || "N/A", 10, y);
+doc.text(`Rs. ${form.amount}`, 160, y);
+
+// 💾 Save
+doc.save(`${selectedParty.name}-invoice.pdf`);
+
+  alert("Transaction Saved & PDF Downloaded ✅");
+
   setOpen(false);
+};
+
+//download pdf
+const handleDownload = async (party) => {
+  const res = await fetch(`/api/ledger?party_id=${party.id}`);
+  const data = await res.json();
+
+  const doc = new jsPDF();
+
+  // Title
+  doc.setFontSize(16);
+  doc.text(`Ledger Report - ${party.name}`, 14, 15);
+
+  // Table Columns
+  const columns = [
+    { header: "Date", dataKey: "date" },
+    { header: "Type", dataKey: "type" },
+    { header: "Amount", dataKey: "amount" },
+    { header: "Mode", dataKey: "mode" },
+    { header: "Details", dataKey: "details" },
+    { header: "Balance", dataKey: "balance" },
+  ];
+
+  // Prepare Rows + Balance
+  let balance = 0;
+
+  const rows = data.map((t) => {
+    if (t.type === "receive") balance += Number(t.amount);
+    else balance -= Number(t.amount);
+
+    return {
+      date: t.date,
+      type: t.type.toUpperCase(),
+      amount: `Rs. ${t.amount}`,
+      mode: t.mode,
+      details: t.details || "-",
+      balance: `Rs. ${balance}`,
+    };
+  });
+
+  // Generate Table
+  autoTable(doc, {
+    startY: 25,
+    head: [columns.map((col) => col.header)],
+    body: rows.map((row) => Object.values(row)),
+    styles: {
+      fontSize: 9,
+    },
+    headStyles: {
+      fillColor: [22, 160, 133], // green header
+    },
+  });
+
+  // Save PDF
+  doc.save(`${party.name}-ledger.pdf`);
 };
 
   return (
@@ -121,6 +220,17 @@ export default function Transactions() {
               </Button>
             </Box>
           </CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+ 
+            <Button
+            sx={{textAlign:'flex-end',mr:'5%'}}
+                  size="small"
+                  color="primary"
+                  onClick={() => handleDownload(p)}
+                  >
+                    Download
+                 </Button>
+</Box>
         </Card>
       ))}
 
