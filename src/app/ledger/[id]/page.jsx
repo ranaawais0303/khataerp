@@ -51,7 +51,7 @@ export default function Ledger() {
   return (
     <Box p={3}>
       <Typography variant="h5" mb={2}>
-        Ledger
+        Ledger 
       </Typography>
 
       {transactions.map((t, i) => (

@@ -92,6 +92,8 @@ if (!form.name) {
       >
         <MenuItem value="customer">Customer</MenuItem>
         <MenuItem value="supplier">Supplier</MenuItem>
+        <MenuItem value="containers">Container</MenuItem>
+        <MenuItem value="expenses">Expenses</MenuItem>
       </TextField>
 
       <Button variant="contained" fullWidth onClick={handleSubmit}>

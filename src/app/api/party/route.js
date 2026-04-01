@@ -20,13 +20,15 @@ export async function POST(req) {
 // 📋 GET ALL PARTIES
 export async function GET() {
   try {
-    const [rows] = await db.query("SELECT * FROM party ORDER BY id DESC");
+    const [rows] = await db.query("SELECT * FROM party where (type='customer' or type='supplier') ORDER BY id DESC");
     return new Response(JSON.stringify(rows), { status: 200 });
   } catch (err) {
     console.error("GET PARTY ERROR:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 }
+
+
 
 // ✏️ UPDATE PARTY
 export async function PUT(req) {
