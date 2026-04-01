@@ -11,6 +11,7 @@ export async function GET(req) {
      WHERE party_id = ? 
      ORDER BY date ASC`,
     [party_id]
+   
   );
 
   return Response.json(rows);

@@ -8,18 +8,8 @@ import Header from "./components/Header";
 export default function Dashboard() {
   const router = useRouter();
 
-//   useEffect(() => {
-//   const auth = localStorage.getItem("auth");
-//   if (!auth) {
-//     router.push("/login");
-//   }
-// }, []);
   return (
     <Box p={3}>
-      {/* <Typography variant="h5" mb={3}>
-        DigiKhata Dashboard
-      </Typography> */}
-      <Header/>
 
       <Grid container spacing={2}>
         <Grid item xs={6}>

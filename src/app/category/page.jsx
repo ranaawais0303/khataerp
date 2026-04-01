@@ -18,6 +18,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 import { useRouter } from "next/navigation";
+import PDFHandler from "../components/PDFHandler";
 
 
 export default function Category() {
@@ -123,61 +124,61 @@ doc.save(`${selectedParty.name}-invoice.pdf`);
 };
 
 //download pdf
-const handleDownload = async (party) => {
-  const res = await fetch(`/api/ledger?party_id=${party.id}`);
-  const data = await res.json();
+// const handleDownload = async (party) => {
+//   const res = await fetch(`/api/ledger?party_id=${party.id}`);
+//   const data = await res.json();
 
-  const doc = new jsPDF();
+//   const doc = new jsPDF();
 
-  // Title
-  doc.setFontSize(16);
-  doc.text(`Ledger Report - ${party.name}`, 14, 15);
+//   // Title
+//   doc.setFontSize(16);
+//   doc.text(`Ledger Report - ${party.name}`, 14, 15);
 
-  // Table Columns
-  const columns = [
-    { header: "Name", dataKey: "pName" },
-    { header: "Date", dataKey: "date" },
-    { header: "Type", dataKey: "type" },
-    { header: "Amount", dataKey: "amount" },
-    { header: "Mode", dataKey: "mode" },
-    { header: "Details", dataKey: "details" },
-    { header: "Balance", dataKey: "balance" },
-  ];
+//   // Table Columns
+//   const columns = [
+//     { header: "Name", dataKey: "pName" },
+//     { header: "Date", dataKey: "date" },
+//     { header: "Type", dataKey: "type" },
+//     { header: "Amount", dataKey: "amount" },
+//     { header: "Mode", dataKey: "mode" },
+//     { header: "Details", dataKey: "details" },
+//     { header: "Balance", dataKey: "balance" },
+//   ];
 
-  // Prepare Rows + Balance
-  let balance = 0;
+//   // Prepare Rows + Balance
+//   let balance = 0;
 
-  const rows = data.map((t) => {
-    if (t.type === "receive") balance += Number(t.amount);
-    else balance -= Number(t.amount);
+//   const rows = data.map((t) => {
+//     if (t.type === "receive") balance += Number(t.amount);
+//     else balance -= Number(t.amount);
 
-    return {
-      Name: t.pName,
-      date: t.date,
-      type: t.type.toUpperCase(),
-      amount: `Rs. ${t.amount}`,
-      mode: t.mode,
-      details: t.details || "-",
-      balance: `Rs. ${balance}`,
-    };
-  });
+//     return {
+//       Name: t.pName,
+//       date: t.date,
+//       type: t.type.toUpperCase(),
+//       amount: `Rs. ${t.amount}`,
+//       mode: t.mode,
+//       details: t.details || "-",
+//       balance: `Rs. ${balance}`,
+//     };
+//   });
 
-  // Generate Table
-  autoTable(doc, {
-    startY: 25,
-    head: [columns.map((col) => col.header)],
-    body: rows.map((row) => Object.values(row)),
-    styles: {
-      fontSize: 9,
-    },
-    headStyles: {
-      fillColor: [22, 160, 133], // green header
-    },
-  });
+//   // Generate Table
+//   autoTable(doc, {
+//     startY: 25,
+//     head: [columns.map((col) => col.header)],
+//     body: rows.map((row) => Object.values(row)),
+//     styles: {
+//       fontSize: 9,
+//     },
+//     headStyles: {
+//       fillColor: [22, 160, 133], // green header
+//     },
+//   });
 
-  // Save PDF
-  doc.save(`${party.name}-ledger.pdf`);
-};
+//   // Save PDF
+//   doc.save(`${party.name}-ledger.pdf`);
+// };
 
   return (
     <Box p={3}>
@@ -225,14 +226,15 @@ const handleDownload = async (party) => {
           </CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
  
-            <Button
+            {/* <Button
             sx={{textAlign:'flex-end',mr:'5%'}}
                   size="small"
                   color="primary"
                   onClick={() => handleDownload(p)}
                   >
                     Download
-                 </Button>
+                 </Button> */}
+                  <PDFHandler party={p} act={"preview"}/>
 </Box>
         </Card>
       ))}

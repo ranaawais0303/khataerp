@@ -39,9 +39,14 @@ export async function PUT(req) {
   try {
     const { party_id } = await req.json();
     const [rows] = await db.query(
-      "SELECT * FROM transactions WHERE party_id = ? ORDER BY id ASC",
-      [party_id]
-    );
+  `SELECT t.*, p.name
+   FROM transactions t
+   JOIN party p ON t.party_id = p.id
+   WHERE t.party_id = ?
+   ORDER BY t.id ASC`,
+  [party_id]
+);
+
     return new Response(JSON.stringify(rows), { status: 200 });
   } catch (err) {
     console.error("PUT TRANSACTION ERROR:", err);
