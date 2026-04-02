@@ -270,7 +270,6 @@ export default function Category() {
   >
     Save
   </Button>
-  <PDFHandler party={{ ...t, data: [form] }} />
           <Button variant="contained" fullWidth onClick={handleSave}>
             Save
           </Button>
