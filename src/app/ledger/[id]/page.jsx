@@ -8,13 +8,19 @@ import {
   Card,
   CardContent,
   Button,
+  IconButton,
 } from "@mui/material";
 import PDFHandler from "@/app/components/PDFHandler";
+import EditSquareIcon from '@mui/icons-material/EditSquare';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import TransactionDialog from "@/app/components/TransactionDialog";
 
 export default function Ledger() {
   const { id } = useParams();
 
   const [transactions, setTransactions] = useState([]);
+const [open, setOpen] = useState(false);
+const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [category, setCategory]=useState("")
 
   // 📥 Fetch transactions
@@ -49,7 +55,71 @@ export default function Ledger() {
 
         setTransactions(withBalance);
       });
-  }, [id]);
+  }, [id,selectedTransaction]);
+const handleEdit =  (d) => {
+  console.log(d,"id from transactions");
+  const transaction= d
+     if (transaction.date) {
+        transaction.date = new Date(transaction.date)
+          .toISOString()
+          .split("T")[0];
+      }
+  
+
+    // Store it in state
+    
+    // Open dialog
+    setOpen(true);
+    setSelectedTransaction(transaction);
+
+};
+
+const handleSave = async (form) => {
+    try {
+      if (!form.amount) {
+        alert("Amount is required ❌");
+        return;
+      }
+
+      if (form.id) {
+        // Edit → PATCH request
+        await fetch("/api/transactions", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        alert("Transaction updated ✅");
+      } else {
+        // Add → POST request
+        await fetch("/api/transactions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        alert("Transaction added ✅");
+      }
+
+      setOpen(false);
+      setSelectedTransaction(null);
+    } catch (err) {
+      console.error("Error saving transaction:", err);
+    }
+  };
+
+  //Delete
+    const handleArchive = async (id) => {
+    if (!window.confirm("Are you sure you want to archive this transaction?")) return;
+    try {
+      await fetch("/api/transactions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      alert("Transaction archived ✅");
+    } catch (err) {
+      console.error("Error archiving transaction:", err);
+    }
+  };
 
   return (
     
@@ -77,7 +147,7 @@ const borderColor =
   t.type === "receive" ? "#2e7d32" : "#d32f2f";
         
         setCategory(t)
-        return <Box key={i}>  
+        return (!t.archieved&&<Box key={i}>  
         <Card key={i} s  sx={{
     mb: 2,
     borderRadius: 3,
@@ -122,11 +192,25 @@ const borderColor =
                 {t.type === "receive" ? "+" : "-"} Rs {t.amount}
               </Typography>
               <PDFHandler party={{ ...t, data: [t] }}  act={"preview"}/>
+                <IconButton onClick={()=>handleEdit(t)} color="primary">
+      <EditSquareIcon />
+      </IconButton>
+      <IconButton onClick={() => handleArchive(t.id)} color="error">
+      <DeleteForeverIcon />
+      </IconButton>
+
             {/* party={[t]} */}
               {/* <PDFHandler party={t} act={"preview"}/> */}
             </Box>
           </CardContent>
-        </Card></Box>
+        </Card>
+        <TransactionDialog
+  open={open}
+  onClose={() => setOpen(false)}
+  initialValues={selectedTransaction} // 👈 Prefills the form
+  onSave={handleSave}
+/>
+        </Box>)
 })}
     </Box>
   );

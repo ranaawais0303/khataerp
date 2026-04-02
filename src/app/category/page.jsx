@@ -19,6 +19,7 @@ import autoTable from "jspdf-autotable";
 
 import { useRouter } from "next/navigation";
 import PDFHandler from "../components/PDFHandler";
+import TransactionDialog from "../components/TransactionDialog";
 
 
 export default function Category() {
@@ -58,14 +59,14 @@ export default function Category() {
     setOpen(true);
   };
 
-  // 💾 Save Transaction with category
-  const handleSave = async () => {
+  
+const handleSave = async (data) => {
   if (!selectedParty) {
     alert("No party selected ❌");
     return;
   }
 
-  if (!form.amount) {
+  if (!data.amount) {
     alert("Enter amount ❌");
     return;
   }
@@ -73,16 +74,12 @@ export default function Category() {
   await fetch("/api/category", {
     method: "POST",
     body: JSON.stringify({
-      ...form,
+      ...data,
       party_id: selectedParty.id,
     }),
   });
 
   alert("Transaction Saved ✅");
-  // 🧾 Generate PDF after save
- 
-
-
   setOpen(false);
 };
 
@@ -160,8 +157,18 @@ export default function Category() {
 
       {/* 📋 Party List */}
       {filtered.map((p) => (
-        <Card key={p.id}
-    sx={{ mb: 1 }}
+        <Card 
+        key={p.id}
+        sx={{
+            mb: 2,
+            borderRadius: 3,
+            boxShadow: 2,
+            transition: "0.2s",
+            "&:hover": {
+              boxShadow: 6,
+        transform: "scale(1.01)",
+      },
+    }}
    >
           <CardContent
             sx={{ display: "flex", justifyContent: "space-between" }}
@@ -169,23 +176,27 @@ export default function Category() {
             <Typography sx={{ mb: 1, cursor: "pointer" }}
     onClick={() => router.push(`/ledger/${p.id}`)}>{p.name}</Typography>
 
-            <Box>
-              <Button
-                size="small"
-                color="success"
-                onClick={() => handleOpen(p, "receive")}
-              >
-                Receive
-              </Button>
+  <Box sx={{ display: "flex", gap: 1 }}>
+        <Button
+          size="small"
+          variant="contained"
+          color="success"
+          onClick={() => handleOpen(p, "receive")}
+        >
+          Receive
+        </Button>
 
-              <Button
-                size="small"
-                color="error"
-                onClick={() => handleOpen(p, "payment")}
-              >
-                Payment
-              </Button>
-            </Box>
+        <Button
+          size="small"
+          variant="contained"
+          color="error"
+          onClick={() => handleOpen(p, "payment")}
+        >
+          Payment
+        </Button>
+      </Box>
+
+
           </CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
  
@@ -203,80 +214,14 @@ export default function Category() {
       ))}
 
       {/* 🧾 Modal */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>
-          {form.type === "receive" ? "Receive" : "Payment"}
-        </DialogTitle>
-
-        <DialogContent>
-          <TextField
-            label="Name"
-            type="text"
-            fullWidth
-            sx={{ mt: 1, mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...form, pName: e.target.value })
-            }
-          />
-          <TextField
-            label="Amount"
-            type="number"
-            fullWidth
-            sx={{ mt: 1, mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...form, amount: e.target.value })
-            }
-          />
-
-          <TextField
-            select
-            label="Mode"
-            fullWidth
-            sx={{ mb: 2 }}
-            value={form.mode}
-            onChange={(e) =>
-              setForm({ ...form, mode: e.target.value })
-            }
-          >
-            <MenuItem value="cash">Cash</MenuItem>
-            <MenuItem value="bank">Bank</MenuItem>
-          </TextField>
-
-          <TextField
-            type="date"
-            fullWidth
-            sx={{ mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...form, date: e.target.value })
-            }
-          />
-
-          <TextField
-            label="Details"
-            fullWidth
-            sx={{ mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...form, details: e.target.value })
-            }
-          />
-
-<Box display="flex" gap={2}>
-  <Button
-    variant="contained"
-    fullWidth
-    onClick={
-      handleSave
-    }
-  >
-    Save
-  </Button>
-          <Button variant="contained" fullWidth onClick={handleSave}>
-            Save
-          </Button>
-            <PDFHandler party={{ ...form, data: [form] }} />
-          </Box>
-        </DialogContent>
-      </Dialog>
+<TransactionDialog
+  open={open}
+  onClose={() => setOpen(false)}
+  onSave={handleSave}                // function receives form data
+  section="category"                 // optional, shows Name field
+/>
+          
+       
     </Box>
   );
 }

@@ -22,7 +22,7 @@ if (!data || data.length === 0) {
     const doc = new jsPDF();
 
     doc.setFontSize(16);
-    doc.text(`Ledger Report - ${party.name}`, 14, 15);
+    doc.text(`Transactions Report - ${party.name}`, 14, 15);
 
     let balance = 0;
 
@@ -78,10 +78,10 @@ console.log(hasPName,"has name ")
       {/* <Button size="small" onClick={() => handlePDF("preview")}>
         Preview
       </Button> */}
-      <IconButton onClick={() => handlePDF("preview")} color="primary">
+      <IconButton onClick={() => handlePDF("preview")} color="warning">
       <RemoveRedEyeIcon />
       </IconButton>
-      <IconButton onClick={() => handlePDF("download")} color="primary">
+      <IconButton onClick={() => handlePDF("download")} color="secondary">
       <CloudDownloadIcon />
       </IconButton>
 

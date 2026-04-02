@@ -34,7 +34,7 @@ export default function Dashboard() {
             Transactions
           </Button>
         </Grid>
-
+        
         <Grid item xs={6}>
           <Button
           sx={{borderRadius:'10px',backgroundColor:'#bf930d'}}
@@ -45,6 +45,18 @@ export default function Dashboard() {
             Report
           </Button>
         </Grid>
+
+         <Grid item xs={6}>
+          <Button
+          sx={{borderRadius:'10px',backgroundColor:'#5f4ea6'}}
+            fullWidth
+            variant="contained"
+            onClick={() => router.push("/category")}
+          >
+            Category
+          </Button>
+        </Grid>
+
 
         <Grid item xs={6}>
           <Button

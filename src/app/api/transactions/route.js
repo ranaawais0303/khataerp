@@ -18,12 +18,14 @@ export async function POST(req) {
   }
 }
 
+
+
 // 📋 GET ALL TRANSACTIONS
 export async function GET() {
   try {
     const [rows] = await db.query(`
       SELECT p.id, p.name, p.type
-      FROM party p
+      FROM party p where p.type IN ('customer','supplier')
       ORDER BY p.id ASC
     `);
 
@@ -54,14 +56,40 @@ export async function PUT(req) {
   }
 }
 
+// 🔄 UPDATE TRANSACTION
+export async function PATCH(req) {
+  try {
+    const { id, type, amount, mode, date, details } = await req.json();
+
+    if (!id) throw new Error("Transaction ID is required");
+
+    await db.query(
+      `UPDATE transactions
+       SET type = ?, amount = ?, mode = ?, date = ?, details = ?
+       WHERE id = ?`,
+      [type, amount, mode, date, details, id]
+    );
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (err) {
+    console.error("PATCH TRANSACTION ERROR:", err);
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+}
+
 // ❌ DELETE TRANSACTION
+// 🗄️ ARCHIVE TRANSACTION
 export async function DELETE(req) {
   try {
     const { id } = await req.json();
-    await db.query("DELETE FROM transactions WHERE id = ?", [id]);
+    if (!id) throw new Error("Transaction ID is required");
+
+    // Archive instead of delete
+    await db.query("UPDATE transactions SET archived = 1 WHERE id = ?", [id]);
+
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (err) {
-    console.error("DELETE TRANSACTION ERROR:", err);
+    console.error("ARCHIVE TRANSACTION ERROR:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 }

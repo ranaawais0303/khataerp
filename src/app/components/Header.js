@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography, IconButton, Button } from "@mui/material";
 // import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import HouseIcon from '@mui/icons-material/House';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -43,10 +44,14 @@ const Header = () => {
     </IconButton>
 
     <Typography variant="h6">
-      <Link href="/" style={{ color: "white", textDecoration: "none" }}>
         Mehboob Enterprises
-      </Link>
+      
     </Typography>
+
+        <IconButton color="inherit" onClick={() => router.back()}>
+      <HouseIcon />
+      <Link href="/" style={{ color: "white", textDecoration: "none" }}/>
+    </IconButton>
 
   </Toolbar>
 </AppBar>

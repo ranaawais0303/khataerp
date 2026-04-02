@@ -39,7 +39,7 @@ export default function Report() {
   return (
     <Box p={3}>
       <Typography variant="h5" mb={2}>
-        Overall Report
+        Recievables/ Payables Reports
       </Typography>
 
       {/* 🔍 Search */}

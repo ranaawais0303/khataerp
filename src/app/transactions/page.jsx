@@ -20,6 +20,7 @@ import autoTable from "jspdf-autotable";
 import { useRouter } from "next/navigation";
 import PDFHandler from "../components/PDFHandler";
 import { handlePreview } from "../utils/utils";
+import TransactionDialog from "../components/TransactionDialog";
 
 
 export default function Transactions() {
@@ -28,6 +29,14 @@ export default function Transactions() {
 
   const [open, setOpen] = useState(false);
   const [selectedParty, setSelectedParty] = useState(null);
+  const initialValues = {
+    name:"",
+    amount: "",
+    mode: "cash",
+    date: "",
+    details: "",
+    type: "receive",
+  }
   const [formData, setForm] = useState({
     name:"",
     amount: "",
@@ -65,68 +74,92 @@ export default function Transactions() {
   };
 
   // 💾 Save Transaction
-  const handleSave = async () => {
+//   const handleSave = async () => {
+//   if (!selectedParty) {
+//     alert("No party selected ❌");
+//     return;
+//   }
+
+//   if (!formData.amount) {
+//     alert("Enter amount ❌");
+//     return;
+//   }
+
+
+//   await fetch("/api/transactions", {
+//     method: "POST",
+//     body: JSON.stringify({
+//       ...formData,
+//       party_id: selectedParty.id,
+//     }),
+//   });
+
+//   alert("Transaction Saved ✅");
+//   // 🧾 Generate PDF after save
+ 
+// // const doc = new jsPDF();
+
+// // // 🧾 Title (center)
+// // doc.setFontSize(18);
+// // doc.text("INVOICE", 105, 10, { align: "center" });
+
+// // // 📅 Right top (date & time)
+// // const now = new Date();
+// // doc.setFontSize(10);
+// // doc.text(
+// //   `Date: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`,
+// //   200,
+// //   10,
+// //   { align: "right" }
+// // );
+
+// // // 👤 Left top (customer)
+// // doc.text(`Customer: ${selectedParty.name}`, 10, 20);
+
+// // // 📋 Table header
+// // let y = 40;
+// // doc.setFontSize(12);
+// // doc.text("Details", 10, y);
+// // doc.text("Amount", 160, y);
+
+// // // ➖ Line
+// // y += 5;
+// // doc.line(10, y, 200, y);
+
+// // // 📄 Data row
+// // y += 10;
+// // doc.text(formData.details || "N/A", 10, y);
+// // doc.text(`Rs. ${formData.amount}`, 160, y);
+
+// // // 💾 Save
+// // doc.save(`${selectedParty.name}-invoice.pdf`);
+
+// //   alert("Transaction Saved & PDF Downloaded ✅");
+
+//   setOpen(false);
+// };
+
+
+const handleSave = async (data) => {
   if (!selectedParty) {
     alert("No party selected ❌");
     return;
   }
 
-  if (!formData.amount) {
+  if (!data.amount) {
     alert("Enter amount ❌");
     return;
   }
 
-
   await fetch("/api/transactions", {
     method: "POST",
     body: JSON.stringify({
-      ...formData,
+      ...data,
       party_id: selectedParty.id,
     }),
   });
 
   alert("Transaction Saved ✅");
-  // 🧾 Generate PDF after save
- 
-// const doc = new jsPDF();
-
-// // 🧾 Title (center)
-// doc.setFontSize(18);
-// doc.text("INVOICE", 105, 10, { align: "center" });
-
-// // 📅 Right top (date & time)
-// const now = new Date();
-// doc.setFontSize(10);
-// doc.text(
-//   `Date: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`,
-//   200,
-//   10,
-//   { align: "right" }
-// );
-
-// // 👤 Left top (customer)
-// doc.text(`Customer: ${selectedParty.name}`, 10, 20);
-
-// // 📋 Table header
-// let y = 40;
-// doc.setFontSize(12);
-// doc.text("Details", 10, y);
-// doc.text("Amount", 160, y);
-
-// // ➖ Line
-// y += 5;
-// doc.line(10, y, 200, y);
-
-// // 📄 Data row
-// y += 10;
-// doc.text(formData.details || "N/A", 10, y);
-// doc.text(`Rs. ${formData.amount}`, 160, y);
-
-// // 💾 Save
-// doc.save(`${selectedParty.name}-invoice.pdf`);
-
-//   alert("Transaction Saved & PDF Downloaded ✅");
-
   setOpen(false);
 };
 
@@ -279,82 +312,10 @@ export default function Transactions() {
 ))}
 
       {/* 🧾 Modal */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>
-          {formData.type === "receive" ? "Receive" : "Payment"}
-        </DialogTitle>
-
-        <DialogContent>
-          <TextField
-            label="Amount"
-            type="number"
-            fullWidth
-            sx={{ mt: 1, mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...formData, amount: e.target.value })
-            }
-          />
-
-          <TextField
-            select
-            label="Mode"
-            fullWidth
-            sx={{ mb: 2 }}
-            value={formData.mode}
-            onChange={(e) =>
-              setForm({ ...formData, mode: e.target.value })
-            }
-          >
-            <MenuItem value="cash">Cash</MenuItem>
-            <MenuItem value="bank">Bank</MenuItem>
-          </TextField>
-
-          <TextField
-            type="date"
-            fullWidth
-            sx={{ mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...formData, date: e.target.value })
-            }
-          />
-
-          <TextField
-            label="Details"
-            fullWidth
-            sx={{ mb: 2 }}
-            onChange={(e) =>
-              setForm({ ...formData, details: e.target.value })
-            }
-          />
-
-          {/* <Button variant="contained" fullWidth onClick={handleSave}>
-            Save
-          </Button> */}
-          <Box display="flex" gap={2}>
-  <Button
-    variant="contained"
-    fullWidth
-    onClick={
-      handleSave
-    }
-  >
-    Save
-  </Button>
-  <PDFHandler party={{ ...formData, data: [formData] }} />
- {/* party={[formData]} */}
-  {/* <Button
-    variant="outlined"
-    fullWidth
-    onClick={(e) => {
-      e.preventDefault();
-      handlePreview(formData);
-    }}
-  >
-    Preview
-  </Button> */}
-</Box>
-        </DialogContent>
-      </Dialog>
+     <TransactionDialog
+  open={open}
+  onClose={() => setOpen(false)}
+  onSave={handleSave}/>
     </Box>
   );
 }
