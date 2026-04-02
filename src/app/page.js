@@ -20,7 +20,7 @@ export default function Dashboard() {
             variant="contained"
             onClick={() => router.push("/master")}
           >
-            Master
+            Main
           </Button>
         </Grid>
 
@@ -53,7 +53,7 @@ export default function Dashboard() {
             variant="contained"
             onClick={() => router.push("/category")}
           >
-            Category
+            General Entries
           </Button>
         </Grid>
 
