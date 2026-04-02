@@ -334,15 +334,15 @@ export default function Transactions() {
   <Button
     variant="contained"
     fullWidth
-    onClick={(e) => {
-      e.preventDefault();
-      handleSave({...formData});
-    }}
+    onClick={
+      handleSave
+    }
   >
     Save
   </Button>
-
-  <Button
+  <PDFHandler party={{ ...formData, data: [formData] }} />
+ {/* party={[formData]} */}
+  {/* <Button
     variant="outlined"
     fullWidth
     onClick={(e) => {
@@ -351,7 +351,7 @@ export default function Transactions() {
     }}
   >
     Preview
-  </Button>
+  </Button> */}
 </Box>
         </DialogContent>
       </Dialog>

@@ -10,7 +10,6 @@ import {
   Button,
 } from "@mui/material";
 import PDFHandler from "@/app/components/PDFHandler";
-import { handlePreview } from "@/app/utils/utils";
 
 export default function Ledger() {
   const { id } = useParams();
@@ -55,12 +54,18 @@ export default function Ledger() {
   return (
     
     <Box p={3}>
-      <Typography  variant="h5" mb={2}>
-        Ledger {category?category.name:''}
-      </Typography>
-      <Typography variant="bold" display="block" >
-                Balance: {category?.balance}
-              </Typography>
+   
+<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+  
+  <Typography variant="h5">
+    Ledger {category ? category.name : ""}
+  </Typography>
+
+  <Typography fontWeight="bold">
+    Balance: {category?.balance}
+  </Typography>
+
+</Box>
       
                
             
@@ -116,10 +121,8 @@ const borderColor =
               >
                 {t.type === "receive" ? "+" : "-"} Rs {t.amount}
               </Typography>
-<Button size="small" onClick={(e) => handlePreview(t)}>
-        Preview
-      </Button>
-            
+              <PDFHandler party={{ ...t, data: [t] }}  act={"preview"}/>
+            {/* party={[t]} */}
               {/* <PDFHandler party={t} act={"preview"}/> */}
             </Box>
           </CardContent>

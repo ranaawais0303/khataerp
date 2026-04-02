@@ -1,11 +1,23 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Button } from "@mui/material";
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import IconButton from '@mui/material/IconButton';
 
 export default function PDFHandler({ party, act }) {
+  console.log(party,"party from pdf handler")
   const handlePDF = async (action = act) => {
-    const res = await fetch(`/api/ledger?party_id=${party.id}`);
-    const data = await res.json();
+    
+let data = party?.data;
+console.log(party?.data,"part data")
+
+if (!data || data.length === 0) {
+  const res = await fetch(`/api/ledger?party_id=${party.id}`);
+  data = await res.json();
+}
+    // const res = await fetch(`/api/ledger?party_id=${party.id}`);
+    // const data = await res.json();
+  console.log(party,"party from pdf handler")
 
     const doc = new jsPDF();
 
@@ -14,9 +26,10 @@ export default function PDFHandler({ party, act }) {
 
     let balance = 0;
 
+    console.log(data,"lo g data")
     // 🔥 detect structure
-    const hasPName = !!data[0]?.pName;
-
+   const hasPName = data[0]?.pName && data[0]?.pName !== "-";
+console.log(hasPName,"has name ")
     const columns = hasPName
       ? ["Name", "Date", "Type", "Amount", "Mode", "Details", "Balance"]
       : ["Date", "Type", "Amount", "Mode", "Balance"];
@@ -62,13 +75,19 @@ export default function PDFHandler({ party, act }) {
 
   return (
     <>
-      <Button size="small" onClick={() => handlePDF("preview")}>
+      {/* <Button size="small" onClick={() => handlePDF("preview")}>
         Preview
-      </Button>
+      </Button> */}
+      <IconButton onClick={() => handlePDF("preview")} color="primary">
+      <RemoveRedEyeIcon />
+      </IconButton>
+      <IconButton onClick={() => handlePDF("download")} color="primary">
+      <CloudDownloadIcon />
+      </IconButton>
 
-      <Button size="small" onClick={() => handlePDF("download")}>
+      {/* <Button size="small" onClick={() => handlePDF("download")}>
         Download
-      </Button>
+      </Button> */}
     </>
   );
 }
