@@ -24,8 +24,9 @@ export default function Master() {
             Add Party
           </Button>
         </Grid>
-
-        <Grid item xs={6}>
+   
+   {false&&
+     <>  <Grid item xs={6}>
           <Button 
           sx={{backgroundColor:'#bf430d'}}
           fullWidth variant="contained">
@@ -47,7 +48,7 @@ export default function Master() {
            fullWidth variant="contained">
             Add Opening
           </Button>
-        </Grid>
+        </Grid></>}
       </Grid>
     </Box>
   );

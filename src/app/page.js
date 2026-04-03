@@ -58,7 +58,7 @@ export default function Dashboard() {
         </Grid>
 
 
-        <Grid item xs={6}>
+{false &&<>        <Grid item xs={6}>
           <Button
           sx={{borderRadius:'10px',backgroundColor:'#268581'}}
            fullWidth variant="contained">
@@ -72,7 +72,7 @@ export default function Dashboard() {
           fullWidth variant="contained">
             Purchase (Coming)
           </Button>
-        </Grid>
+        </Grid></>}
       </Grid>
     </Box>
   );

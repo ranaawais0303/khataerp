@@ -8,15 +8,11 @@ import {
   Box,
   Card,
   CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  MenuItem,
+  Grid,
+
 } from "@mui/material";
-
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
+import AddIcon from "@mui/icons-material/Add";
+import Tooltip from "@mui/material/Tooltip";
 import { useRouter } from "next/navigation";
 import PDFHandler from "../components/PDFHandler";
 import TransactionDialog from "../components/TransactionDialog";
@@ -154,6 +150,22 @@ const handleSave = async (data) => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
+       <Grid item xs={12} sx={{ mb: '10px' ,display: "flex", justifyContent: "flex-end" }}>
+      <Tooltip title="Add Party">
+  <Button
+    sx={{
+    backgroundColor: "#268581",
+    borderRadius: "50%",
+    minWidth: "40px",   // 👈 smaller width
+    height: "40px",     // 👈 smaller height
+    padding: 0
+  }}
+    onClick={() => router.push("/master/add-party")}
+  >
+    <AddIcon sx={{ color: "#fff" }} />
+  </Button>
+    </Tooltip>
+</Grid>
 
       {/* 📋 Party List */}
       {filtered.map((p) => (

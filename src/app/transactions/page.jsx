@@ -12,10 +12,10 @@ import {
   DialogTitle,
   DialogContent,
   MenuItem,
+  Grid,
 } from "@mui/material";
-
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import AddIcon from "@mui/icons-material/Add";
+import Tooltip from "@mui/material/Tooltip";
 
 import { useRouter } from "next/navigation";
 import PDFHandler from "../components/PDFHandler";
@@ -63,7 +63,6 @@ export default function Transactions() {
 
   // ➕ Open Modal
   const handleOpen = (party, type) => {
-    console.log(party.name,"here is the party bro")
     setSelectedParty(party);
       setForm({
     ...formData,
@@ -73,71 +72,6 @@ export default function Transactions() {
     setOpen(true);
   };
 
-  // 💾 Save Transaction
-//   const handleSave = async () => {
-//   if (!selectedParty) {
-//     alert("No party selected ❌");
-//     return;
-//   }
-
-//   if (!formData.amount) {
-//     alert("Enter amount ❌");
-//     return;
-//   }
-
-
-//   await fetch("/api/transactions", {
-//     method: "POST",
-//     body: JSON.stringify({
-//       ...formData,
-//       party_id: selectedParty.id,
-//     }),
-//   });
-
-//   alert("Transaction Saved ✅");
-//   // 🧾 Generate PDF after save
- 
-// // const doc = new jsPDF();
-
-// // // 🧾 Title (center)
-// // doc.setFontSize(18);
-// // doc.text("INVOICE", 105, 10, { align: "center" });
-
-// // // 📅 Right top (date & time)
-// // const now = new Date();
-// // doc.setFontSize(10);
-// // doc.text(
-// //   `Date: ${now.toLocaleDateString()}\nTime: ${now.toLocaleTimeString()}`,
-// //   200,
-// //   10,
-// //   { align: "right" }
-// // );
-
-// // // 👤 Left top (customer)
-// // doc.text(`Customer: ${selectedParty.name}`, 10, 20);
-
-// // // 📋 Table header
-// // let y = 40;
-// // doc.setFontSize(12);
-// // doc.text("Details", 10, y);
-// // doc.text("Amount", 160, y);
-
-// // // ➖ Line
-// // y += 5;
-// // doc.line(10, y, 200, y);
-
-// // // 📄 Data row
-// // y += 10;
-// // doc.text(formData.details || "N/A", 10, y);
-// // doc.text(`Rs. ${formData.amount}`, 160, y);
-
-// // // 💾 Save
-// // doc.save(`${selectedParty.name}-invoice.pdf`);
-
-// //   alert("Transaction Saved & PDF Downloaded ✅");
-
-//   setOpen(false);
-// };
 
 
 const handleSave = async (data) => {
@@ -164,60 +98,6 @@ const handleSave = async (data) => {
 };
 
 
-//download pdf
-// const handleDownload = async (party) => {
-//   const res = await fetch(`/api/ledger?party_id=${party.id}`);
-//   const data = await res.json();
-
-//   const doc = new jsPDF();
-
-//   // Title
-//   doc.setFontSize(16);
-//   doc.text(`Ledger Report - ${party.name}`, 14, 15);
-
-//   // Table Columns
-//   const columns = [
-//     { header: "Date", dataKey: "date" },
-//     { header: "Type", dataKey: "type" },
-//     { header: "Amount", dataKey: "amount" },
-//     { header: "Mode", dataKey: "mode" },
-//     { header: "Details", dataKey: "details" },
-//     { header: "Balance", dataKey: "balance" },
-//   ];
-
-//   // Prepare Rows + Balance
-//   let balance = 0;
-
-//   const rows = data.map((t) => {
-//     if (t.type === "receive") balance += Number(t.amount);
-//     else balance -= Number(t.amount);
-
-//     return {
-//       date: t.date,
-//       type: t.type.toUpperCase(),
-//       amount: `Rs. ${t.amount}`,
-//       mode: t.mode,
-//       details: t.details || "-",
-//       balance: `Rs. ${balance}`,
-//     };
-//   });
-
-//   // Generate Table
-//   autoTable(doc, {
-//     startY: 25,
-//     head: [columns.map((col) => col.header)],
-//     body: rows.map((row) => Object.values(row)),
-//     styles: {
-//       fontSize: 9,
-//     },
-//     headStyles: {
-//       fillColor: [22, 160, 133], // green header
-//     },
-//   });
-
-//   // Save PDF
-//   doc.save(`${party.name}-ledger.pdf`);
-// };
 
 
   return (
@@ -234,7 +114,22 @@ const handleSave = async (data) => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-
+        <Grid item xs={12} sx={{ mb: '10px' ,display: "flex", justifyContent: "flex-end" }}>
+      <Tooltip title="Add Party">
+  <Button
+    sx={{
+    backgroundColor: "#268581",
+    borderRadius: "50%",
+    minWidth: "40px",   // 👈 smaller width
+    height: "40px",     // 👈 smaller height
+    padding: 0
+  }}
+    onClick={() => router.push("/master/add-party")}
+  >
+    <AddIcon sx={{ color: "#fff" }} />
+  </Button>
+    </Tooltip>
+</Grid>
       {/* 📋 Party List */}
       {filtered.map((p) => (
   <Card
