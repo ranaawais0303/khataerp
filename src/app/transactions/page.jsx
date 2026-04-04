@@ -29,22 +29,9 @@ export default function Transactions() {
 
   const [open, setOpen] = useState(false);
   const [selectedParty, setSelectedParty] = useState(null);
-  const initialValues = {
-    name:"",
-    amount: "",
-    mode: "cash",
-    date: "",
-    details: "",
-    type: "receive",
-  }
-  const [formData, setForm] = useState({
-    name:"",
-    amount: "",
-    mode: "cash",
-    date: "",
-    details: "",
-    type: "receive",
-  });
+
+  const [initialValues, setInitialValues] = useState(null);
+
 
   //use router
   const router = useRouter();
@@ -64,11 +51,15 @@ export default function Transactions() {
   // ➕ Open Modal
   const handleOpen = (party, type) => {
     setSelectedParty(party);
-      setForm({
-    ...formData,
-    name: party.name,
-    type: type,
-  });
+      setInitialValues({
+      pName: "",
+      amount: "",
+      mode: "cash",
+      date: "",
+      details: "",
+      type: type, // 🔥 important
+        isEdit: false,
+    });
     setOpen(true);
   };
 
@@ -102,9 +93,26 @@ const handleSave = async (data) => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" mb={2}>
+  <Grid item xs={12} sx={{ mb: 2, display: "flex", justifyContent: "space-between" }}>
+      <Typography variant="h5">
         Transactions
       </Typography>
+       <Tooltip title="Add Party">
+          <Button
+            variant="contained"
+            onClick={() => router.push("/master/add-party")}
+            sx={{
+              backgroundColor: "#268581",
+              borderRadius: "50%",
+              minWidth: "40px",
+              height: "40px",
+              padding: 0,
+            }}
+          >
+            <AddIcon sx={{ color: "#fff" }} fontSize="small" />
+          </Button>
+        </Tooltip>
+        </Grid>
 
       {/* 🔍 Search */}
       <TextField
@@ -114,22 +122,7 @@ const handleSave = async (data) => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-        <Grid item xs={12} sx={{ mb: '10px' ,display: "flex", justifyContent: "flex-end" }}>
-      <Tooltip title="Add Party">
-  <Button
-    sx={{
-    backgroundColor: "#268581",
-    borderRadius: "50%",
-    minWidth: "40px",   // 👈 smaller width
-    height: "40px",     // 👈 smaller height
-    padding: 0
-  }}
-    onClick={() => router.push("/master/add-party")}
-  >
-    <AddIcon sx={{ color: "#fff" }} />
-  </Button>
-    </Tooltip>
-</Grid>
+       
       {/* 📋 Party List */}
       {filtered.map((p) => (
   <Card
@@ -207,10 +200,12 @@ const handleSave = async (data) => {
 ))}
 
       {/* 🧾 Modal */}
-     <TransactionDialog
-  open={open}
-  onClose={() => setOpen(false)}
-  onSave={handleSave}/>
+      <TransactionDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        onSave={handleSave}
+        initialValues={initialValues}
+      />
     </Box>
   );
 }
