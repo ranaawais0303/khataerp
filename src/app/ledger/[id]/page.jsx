@@ -235,6 +235,7 @@ export default function Ledger() {
         onClose={() => setOpen(false)}
         initialValues={selectedTransaction}
         onSave={handleSave}
+        section="category"
       />
     </Box>
   );

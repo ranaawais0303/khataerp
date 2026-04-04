@@ -26,7 +26,7 @@ if (!data || data.length === 0) {
 
     let balance = 0;
 
-    console.log(data,"lo g data")
+    data = data.filter((t) => !t.archived);
     // 🔥 detect structure
    const hasPName = data[0]?.pName && data[0]?.pName !== "-";
 console.log(hasPName,"has name ")

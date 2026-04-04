@@ -25,8 +25,8 @@ const TransactionDialog = ({
   initialValues = null,
   section = "",
 }) => {
-  const isEdit = initialValues?.isEdit;
-
+  const isEdit = !!initialValues;
+console.log(section,"here is the section")
   const [form, setForm] = useState(isEdit?initialValues:defaultForm);
 
   console.log(form,isEdit, "form values")
