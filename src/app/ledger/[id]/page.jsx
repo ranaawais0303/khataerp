@@ -7,21 +7,19 @@ import {
   Box,
   Card,
   CardContent,
-  Button,
   IconButton,
 } from "@mui/material";
 import PDFHandler from "@/app/components/PDFHandler";
-import EditSquareIcon from '@mui/icons-material/EditSquare';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import EditSquareIcon from "@mui/icons-material/EditSquare";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import TransactionDialog from "@/app/components/TransactionDialog";
 
 export default function Ledger() {
   const { id } = useParams();
 
   const [transactions, setTransactions] = useState([]);
-const [open, setOpen] = useState(false);
-const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [category, setCategory]=useState("")
+  const [open, setOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   // 📥 Fetch transactions
   useEffect(() => {
@@ -31,20 +29,18 @@ const [selectedTransaction, setSelectedTransaction] = useState(null);
     })
       .then((res) => res.json())
       .then((data) => {
-        // ✅ Convert amount to number
         const parsed = data.map((t) => ({
           ...t,
           amount: parseFloat(t.amount),
         }));
 
-        // ✅ Calculate running balance
+        // ✅ running balance (optional for each row)
         let runningBalance = 0;
 
         const withBalance = parsed.map((t) => {
-          if (t.type === "receive") {
-            runningBalance += t.amount;
-          } else {
-            runningBalance -= t.amount;
+          if (!t.archived) {
+            if (t.type === "receive") runningBalance += t.amount;
+            else runningBalance -= t.amount;
           }
 
           return {
@@ -55,26 +51,33 @@ const [selectedTransaction, setSelectedTransaction] = useState(null);
 
         setTransactions(withBalance);
       });
-  }, [id,selectedTransaction]);
-const handleEdit =  (d) => {
-  console.log(d,"id from transactions");
-  const transaction= d
-     if (transaction.date) {
-        transaction.date = new Date(transaction.date)
-          .toISOString()
-          .split("T")[0];
-      }
-  
+  }, [id, selectedTransaction]);
 
-    // Store it in state
-    
-    // Open dialog
-    setOpen(true);
+  // ✅ TOTAL BALANCE (excluding archived)
+  const totalBalance = transactions
+    .filter((t) => !t.archived)
+    .reduce((acc, t) => {
+      return t.type === "receive"
+        ? acc + t.amount
+        : acc - t.amount;
+    }, 0);
+
+  // ✏️ Edit
+  const handleEdit = (t) => {
+    const transaction = { ...t };
+
+    if (transaction.date) {
+      transaction.date = new Date(transaction.date)
+        .toISOString()
+        .split("T")[0];
+    }
+
     setSelectedTransaction(transaction);
+    setOpen(true);
+  };
 
-};
-
-const handleSave = async (form) => {
+  // 💾 Save (Add / Edit)
+  const handleSave = async (form) => {
     try {
       if (!form.amount) {
         alert("Amount is required ❌");
@@ -82,7 +85,7 @@ const handleSave = async (form) => {
       }
 
       if (form.id) {
-        // Edit → PATCH request
+        // Update
         await fetch("/api/transactions", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -90,11 +93,14 @@ const handleSave = async (form) => {
         });
         alert("Transaction updated ✅");
       } else {
-        // Add → POST request
+        // Create
         await fetch("/api/transactions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            ...form,
+            party_id: id,
+          }),
         });
         alert("Transaction added ✅");
       }
@@ -102,116 +108,134 @@ const handleSave = async (form) => {
       setOpen(false);
       setSelectedTransaction(null);
     } catch (err) {
-      console.error("Error saving transaction:", err);
+      console.error(err);
     }
   };
 
-  //Delete
-    const handleArchive = async (id) => {
-    if (!window.confirm("Are you sure you want to archive this transaction?")) return;
-    try {
-      await fetch("/api/transactions", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      alert("Transaction archived ✅");
-    } catch (err) {
-      console.error("Error archiving transaction:", err);
-    }
+  // 🗑 Delete
+  const handleArchive = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+
+    await fetch("/api/transactions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    alert("Transaction archived ✅");
   };
 
   return (
-    
     <Box p={3}>
-   
-<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-  
-  <Typography variant="h5">
-    Ledger {category ? category.name : ""}
-  </Typography>
+      {/* 🔝 Header */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5">
+          Ledger {transactions[0]?.name || ""}
+        </Typography>
 
-  <Typography fontWeight="bold">
-    Balance: {category?.balance}
-  </Typography>
+        <Typography fontWeight="bold">
+          Balance: {totalBalance}
+        </Typography>
+      </Box>
 
-</Box>
-      
-               
-            
+      {/* 📋 Transactions */}
       {transactions.map((t, i) => {
-  //      const bgColor =
-  // t.type === "receive" ? "#e8f5e9" : "#fdecea"; // soft bg
+        if (t.archived) return null;
 
-const borderColor =
-  t.type === "receive" ? "#2e7d32" : "#d32f2f";
-        
-        setCategory(t)
-        return (!t.archived&&<Box key={i}>  
-        <Card key={i} s  sx={{
-    mb: 2,
-    borderRadius: 3,
-    boxShadow: 3,
-    bgcolor: "#fff",
-    borderLeft: `6px solid ${borderColor}`,
-    transition: "0.2s",
-    "&:hover": {
-      boxShadow: 6,
-      transform: "scale(1.01)",
-    },
-  }} >
-          <CardContent
+        const borderColor =
+          t.type === "receive" ? "#2e7d32" : "#d32f2f";
+
+        return (
+          <Card
+            key={i}
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
+              mb: 2,
+              borderRadius: 3,
+              boxShadow: 3,
+              borderLeft: `6px solid ${borderColor}`,
+              "&:hover": {
+                boxShadow: 6,
+                transform: "scale(1.01)",
+              },
             }}
           >
-            {/* Left Side */}
-            <Box>
-              <Typography fontWeight="bold">
-                {t.type === "receive" ? "Received from" : "Paid to"} {t.pName}
-              </Typography>
+            <CardContent
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              {/* Left */}
+              <Box>
+                <Typography fontWeight="bold">
+                  {t.type === "receive"
+                    ? "Received from"
+                    : "Paid to"}{" "}
+                  {t.pName}
+                </Typography>
 
-              <Typography variant="body2">
-                {t.details}
-              </Typography>
-            </Box>
+                <Typography variant="body2">
+                  {t.details}
+                </Typography>
+              </Box>
 
-            {/* Right Side */}
-            <Box textAlign="right">
+              {/* Right */}
+              <Box textAlign="right">
+                <Typography variant="caption">
+                  {t.date}
+                </Typography>
 
-            <Typography variant="caption">
-              {t.date}
-            </Typography>
-              <Typography
-                sx={{
-                  color: t.type === "receive" ? "green" : "red",
-                  fontWeight: "bold",
-                }}
-              >
-                {t.type === "receive" ? "+" : "-"} Rs {t.amount}
-              </Typography>
-              <PDFHandler party={{ ...t, data: [t] }}  act={"preview"}/>
-                <IconButton onClick={()=>handleEdit(t)} color="primary">
-      <EditSquareIcon />
-      </IconButton>
-      <IconButton onClick={() => handleArchive(t.id)} color="error">
-      <DeleteForeverIcon />
-      </IconButton>
+                <Typography
+                  sx={{
+                    color:
+                      t.type === "receive"
+                        ? "green"
+                        : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {t.type === "receive" ? "+" : "-"} Rs{" "}
+                  {t.amount}
+                </Typography>
 
-            {/* party={[t]} */}
-              {/* <PDFHandler party={t} act={"preview"}/> */}
-            </Box>
-          </CardContent>
-        </Card>
-        <TransactionDialog
-  open={open}
-  onClose={() => setOpen(false)}
-  initialValues={selectedTransaction} // 👈 Prefills the form
-  onSave={handleSave}
-/>
-        </Box>)
-})}
+                <PDFHandler
+                  party={{ ...t, data: [t] }}
+                  act="preview"
+                />
+
+                <IconButton
+                  onClick={() => handleEdit(t)}
+                  color="primary"
+                >
+                  <EditSquareIcon />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => handleArchive(t.id)}
+                  color="error"
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              </Box>
+            </CardContent>
+          </Card>
+        );
+      })}
+
+      {/* 🧾 Dialog */}
+      <TransactionDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        initialValues={selectedTransaction}
+        onSave={handleSave}
+      />
     </Box>
   );
 }
