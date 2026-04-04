@@ -147,7 +147,7 @@ const borderColor =
   t.type === "receive" ? "#2e7d32" : "#d32f2f";
         
         setCategory(t)
-        return (!t.archieved&&<Box key={i}>  
+        return (!t.archived&&<Box key={i}>  
         <Card key={i} s  sx={{
     mb: 2,
     borderRadius: 3,
